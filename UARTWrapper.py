@@ -1,6 +1,5 @@
-import serial
+import serial# use pyserial
 from time import sleep
-
 
 """
 initializeUART(portName):
@@ -28,6 +27,23 @@ has been tripped.
 def isMotionTriggered(Connection):
 
     Connection.write(b'1\x10')
+
+    data = Connection.readline().decode('ascii')
+
+    return data
+
+
+"""
+UARTACK(Connection):
+
+requests that the Arduino return a 7 over UART.  This is intended to be used in
+order to confirm that the UART connection was successfully openned and is 
+reading correctly.
+
+"""
+def UARTACK(Connection):
+
+    Connection.write(b'7\x10')
 
     data = Connection.readline().decode('ascii')
 
@@ -89,6 +105,11 @@ if __name__ == '__main__':
     # Wait a little while for the connection to be set up
     sleep(2)
 
+    if UARTACK(Connection) == "7":
+        print("UARTOpenned Successfully")
+    else:
+        print('Could not open UART Connection')
+
     # check if the motion sensor has been triggered
     print(isMotionTriggered(Connection))
 
@@ -105,5 +126,3 @@ if __name__ == '__main__':
 
     # close the UART connection when finished
     closeUART(Connection)
-    
-    input("Press enter to close")
