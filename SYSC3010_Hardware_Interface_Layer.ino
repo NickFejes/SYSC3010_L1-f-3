@@ -69,14 +69,14 @@ void setup() {
  * 
  * Command list:
  * 
- * 0  null : null
+ * 0  nop : VOID
  * 1  Check Motion Triggered : BOOLEAN
  * 2  READ BAG PRESENT  : BOOLEAN
  * 3  DISPENSE CANDY  : VOID
  * 4  Clear Motion Triggered  : VOID
  * 5  NOP : VOID
  * 6  NOP : VOID
- * 7  NOP : VOID
+ * 7  ACK : 7 //the ACK command can be used to confirm that the hardware was connected to successfully via UART
  * 
  */
 
@@ -99,9 +99,6 @@ void loop() {
 
   
   switch(command){
-    case (0):
-      
-    break;
     case (1):
       //Check Motion Triggered : BOOLEAN
       if(motionIsTriggered){
@@ -142,6 +139,11 @@ void loop() {
       //4  Clear Motion Triggered  : VOID
       motionIsTriggered = false;
       break;
+    case (7):
+    //7 Acknowledge returns a 7 to over UART.  This is intended to be used to confirm that the UART connection is open and reading correctly
+      Serial.print("7");
+      Serial.flush();
+    break;
     default:
       //invalid command becomes a NOP
     break;
