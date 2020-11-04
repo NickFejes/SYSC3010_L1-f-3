@@ -5,6 +5,7 @@ from time import sleep
 
 class TestUARTWrapperMethods(unittest.TestCase):
 
+	#The only portion of the UARTWrapper that can be tested as a unit is the ACK from the Arduino.  Hardware flags and sensor values cannot be written to
 	def test_initializeUART(self):
 
 		try:
