@@ -13,7 +13,7 @@ class TestUARTWrapperMethods(unittest.TestCase):
 			# wait a couple of seconds to allow the UART connection to be opened
 			sleep(2)
 
-			# confirm that the UARTACK returns the expected value when ACK is called
+			# confirm that the UARTACK returns the expected value when ACK is called on the Arduino
 			self.assertTrue(UART.UARTACK(con))
 
 			UART.closeUART(con)
@@ -25,5 +25,4 @@ class TestUARTWrapperMethods(unittest.TestCase):
 if __name__ == '__main__':
 
 	unittest.main()
-	input('Press enter to continue')
-  
+	input()
