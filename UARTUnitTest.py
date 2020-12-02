@@ -1,5 +1,5 @@
 import unittest
-import UARTWrapper as UART
+import UARTW as UART
 import serial
 from time import sleep
 
