@@ -6,5 +6,5 @@ def alert(machine):
     webhook.send(f'Dispenser {machine} is out of candy and needs to be refilled', username='ALERT')
 
 
-alert('a')
-print("DONE")
+#alert('b')
+#print("DONE")

@@ -30,7 +30,10 @@ def isMotionTriggered(Connection):
 
     data = Connection.readline().decode('ascii')
 
-    return data
+    if(int(data) == 1):
+        return True
+    else:
+        return False
 
 
 """
@@ -47,7 +50,7 @@ def UARTACK(Connection):
 
     data = Connection.readline().decode('ascii')
 
-    if data == "7":
+    if int(data) == 7:
         return True
     else:
         return False
@@ -65,7 +68,10 @@ def isBagPresent(Connection):
 
     data = Connection.readline().decode('ascii')
 
-    return data
+    if(int(data) == 1):
+        return True
+    else:
+        return False
 
 
 """
@@ -104,7 +110,7 @@ if __name__ == '__main__':
 
     # initialize the serial connection on COM7
     try:
-        Connection = initializeUART('COM7')
+        Connection = initializeUART('/dev/ttyACM0')
     except serial.serialutil.SerialException:
         print('Could not open UART connection.  Check device is plugged in and that the correct port was entered')
         #input('press enter to close')
