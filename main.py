@@ -4,16 +4,10 @@ import urllib
 import datetime
 from time import sleep
 from subprocess import call
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import Bot
 import threading
 
-is_motion_triggered = UARTW.isMotionTriggered()
-clear_motion_triggered = UARTW.clearMotionTriggered()
-dispense_candy = UARTW.dispenseCandy()
-initializeUART = UARTW.initializeUART()
-closeUART = UARTW.closeUART()
-is_bag_present = UARTW.isBagPresent()
 # Variable declerations, Machine is different for each dispenser and matches student id "a, b, c"
 Transaction_Number = 1
 candy_remaining = 10
@@ -82,29 +76,29 @@ def update_database():
 
 while True:
     # initialize the serial connection to the arduino
-    Connection = initializeUART('/dev/ttyACM0')
+    Connection = UARTW.initializeUART('/dev/ttyACM0')
     # Wait a little while for the connection to be set up
     sleep(2)
     # Wait one minute for the motion sensor to set up
     sleep(60)
     # check if the motion sensor has been triggered
     while True:
-        if is_motion_triggered(Connection) == 1:
+        if UARTW.isMotionTriggered(Connection) == 1:
             # reset the status of the isMotionTriggered parameter to false
-            clear_motion_triggered(Connection)
+            UARTW.clearMotionTriggered(Connection)
             # check again in 3 seconds to confirm movement
             sleep(3)
-            if is_motion_triggered(Connection) == 1:
+            if UARTW.isMotionTriggered(Connection) == 1:
                 # Play audio greeting
                 play_audio('greeting.mp3')
                 # check if there is a bag to be dispensed into
-                if is_bag_present(Connection) == 1:
+                if UARTW.isBagPresent(Connection) == 1:
                     # dispense candy
-                    dispense_candy(Connection)
+                    UARTW.dispenseCandy(Connection)
                     # play audio well wishing
                     play_audio('happy_halloween.mp3')
                 check_remaining_candy()
         # reset the status of the isMotionTriggered parameter to false
-        clear_motion_triggered(Connection)
+        UARTW.clearMotionTriggered(Connection)
 
     input("Press enter to close")
