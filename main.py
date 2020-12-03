@@ -6,7 +6,7 @@ from time import sleep
 from subprocess import call
 import RPi.GPIO as GPIO
 import Bot
-import threading
+
 import csv
 
 
@@ -17,7 +17,7 @@ Transaction_Number = 0
 candy_remaining = 0
 max_candy = 0
 machine = ''
-refilled = threading.Event()
+empty = False
 greeting_length = 0
 farewell_length = 0
 bagTimeout = 60
@@ -44,8 +44,9 @@ def play_audio(filename):
 def refill_button_pushed():
     play_audio('candy_refilled.mp3')
     global candy_remaining
+    global empty
     candy_remaining = max_candy
-    refilled.set()
+    empty = False
 
 
 # Set up GPIO for refill button
@@ -62,12 +63,14 @@ def check_remaining_candy():
     global machine
     global Transaction_Number
     global max_candy
+    global empty
     Transaction_Number += 1
     if candy_remaining == 0:
+        empty = True
         play_audio('out_of_candy.mp3')
         Bot.alert(machine)
-        refilled.wait()
-        refilled.clear()
+        while empty:
+            pass
     else:
         candy_remaining -= 1
     with open('var.csv', 'w') as csvfile:
