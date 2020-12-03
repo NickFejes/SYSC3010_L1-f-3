@@ -11,8 +11,11 @@ import csv
 
 
 # Variable declerations, Machine is different for each dispenser and matches student id "a, b, c"
+# Transaction_Number, candy_remaining, max_candy, and machine are all read in from an external 
+# .csv file that serves as device specific configuration and non-volatile storage
 Transaction_Number = 0
 candy_remaining = 0
+max_candy = 0
 machine = ''
 refilled = threading.Event()
 greeting_length = 0
@@ -25,15 +28,11 @@ def read_stored_data():
     with open('var.csv', newline = '') as f:
         reader = csv.reader(f)
 
-        i = 0
-
         data = []
 
         for row in reader:
-            if i == 1:
-                print(row)
-                data = row
-            i += 1
+            data = row
+
         return data
 
 
@@ -45,7 +44,7 @@ def play_audio(filename):
 def refill_button_pushed():
     play_audio('candy_refilled.mp3')
     global candy_remaining
-    candy_remaining = 10
+    candy_remaining = max_candy
     refilled.set()
 
 
@@ -61,13 +60,19 @@ GPIO.add_event_detect(10,GPIO.RISING,callback=refill_button_pushed) # Setup even
 def check_remaining_candy():
     global candy_remaining
     global machine
+    global Transaction_Number
+    global max_candy
+    Transaction_Number += 1
     if candy_remaining == 0:
         play_audio('out_of_candy.mp3')
         Bot.alert(machine)
         refilled.wait()
         refilled.clear()
     else:
-        pass
+        candy_remaining -= 1
+    with open('var.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow([str(Transaction_Number), str(candy_remaining), machine, str(max_candy)])
 
 
 def update_database():
@@ -89,8 +94,6 @@ def update_database():
                 conn.close()
             except:
                 print("connection failed")
-            Transaction_Number += 1
-            candy_remaining -= 1
             break
 
     if __name__ == "__main__":
@@ -101,11 +104,11 @@ while True:
 
     # read the transaction number and remaining candy from file
     machine_params = read_stored_data()
-#    print(machine_params)
 
-    Transaction_Number = machine_params[0]
-    candy_remaining = machine_params[1]
+    Transaction_Number = int(machine_params[0])
+    candy_remaining = int(machine_params[1])
     machine = machine_params[2]
+    max_candy = int(machine_params[3])
 
     print(candy_remaining)
 
@@ -114,20 +117,15 @@ while True:
     # Wait a little while for the connection to be set up
     sleep(2)
     # Wait one minute for the motion sensor to set up
-#    sleep(60)
+    sleep(60)
     # check if the motion sensor has been triggered
     while True:
         if UARTW.isMotionTriggered(Connection):
-            print('sleep(5)')
             sleep(5)
             # reset the status of the isMotionTriggered parameter to false
-            print('clear motion')
             UARTW.clearMotionTriggered(Connection)
-            print('sleep(2)')
-#            sleep(2)
             # check again in 3 seconds to confirm movement
             if UARTW.isMotionTriggered(Connection):
-                print('play audio')
                 # Play audio greeting
                 play_audio('greeting.mp3')
                 sleep(greeting_length)
@@ -144,7 +142,6 @@ while True:
                         break
                     sleep(0.5)
             # reset the status of the isMotionTriggered parameter to false
-            print('wait to leave')
             sleep(waitToLeave)
             UARTW.clearMotionTriggered(Connection)
 
