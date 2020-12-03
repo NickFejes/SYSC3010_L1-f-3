@@ -7,16 +7,36 @@ from subprocess import call
 import RPi.GPIO as GPIO
 import Bot
 import threading
+import csv
+
 
 # Variable declerations, Machine is different for each dispenser and matches student id "a, b, c"
-Transaction_Number = 1
-candy_remaining = 8
-machine = 'b'
+Transaction_Number = 0
+candy_remaining = 0
+machine = ''
 refilled = threading.Event()
 greeting_length = 0
 farewell_length = 0
 bagTimeout = 60
 waitToLeave = 5
+
+
+def read_stored_data():
+    with open('var.csv', newline = '') as f:
+        reader = csv.reader(f)
+
+        i = 0
+
+        data = []
+
+        for row in reader:
+            if i == 1:
+                print(row)
+                data = row
+            i += 1
+        return data
+
+
 
 def play_audio(filename):
     call("omxplayer " + str(filename), shell=True)
@@ -78,6 +98,17 @@ def update_database():
 
 
 while True:
+
+    # read the transaction number and remaining candy from file
+    machine_params = read_stored_data()
+#    print(machine_params)
+
+    Transaction_Number = machine_params[0]
+    candy_remaining = machine_params[1]
+    machine = machine_params[2]
+
+    print(candy_remaining)
+
     # initialize the serial connection to the arduino
     Connection = UARTW.initializeUART('/dev/ttyACM0')
     # Wait a little while for the connection to be set up
