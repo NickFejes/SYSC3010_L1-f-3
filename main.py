@@ -13,7 +13,10 @@ Transaction_Number = 1
 candy_remaining = 10
 machine = 'b'
 refilled = threading.Event()
-
+greeting_length = 0
+farewell_length = 0
+bagTimeout = 60
+waitToLeave = 5
 
 def play_audio(filename):
     call("omxplayer " + str(filename), shell=True)
@@ -84,21 +87,27 @@ while True:
     # check if the motion sensor has been triggered
     while True:
         if UARTW.isMotionTriggered(Connection):
+            sleep(5)
             # reset the status of the isMotionTriggered parameter to false
             UARTW.clearMotionTriggered(Connection)
             # check again in 3 seconds to confirm movement
-            sleep(3)
             if UARTW.isMotionTriggered(Connection):
                 # Play audio greeting
                 play_audio('greeting.mp3')
-                # check if there is a bag to be dispensed into
-                if UARTW.isBagPresent(Connection):
-                    # dispense candy
-                    UARTW.dispenseCandy(Connection)
-                    # play audio well wishing
-                    play_audio('happy_halloween.mp3')
-                check_remaining_candy()
+                sleep(greeting_length)
+                for i in range(2*bagTimeout):
+                    # check if there is a bag to be dispensed into
+                    if UARTW.isBagPresent(Connection):
+                        # dispense candy
+                        UARTW.dispenseCandy(Connection)
+                        # play audio well wishing
+                        play_audio('happy_halloween.mp3')
+                        sleep(farewell_length)
+                        check_remaining_candy()
+                        break
+                    sleep(0.5)
         # reset the status of the isMotionTriggered parameter to false
+        sleep(waitToLeave)
         UARTW.clearMotionTriggered(Connection)
 
     input("Press enter to close")
