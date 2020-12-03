@@ -10,7 +10,7 @@ import threading
 
 # Variable declerations, Machine is different for each dispenser and matches student id "a, b, c"
 Transaction_Number = 1
-candy_remaining = 10
+candy_remaining = 8
 machine = 'b'
 refilled = threading.Event()
 greeting_length = 0
@@ -87,11 +87,16 @@ while True:
     # check if the motion sensor has been triggered
     while True:
         if UARTW.isMotionTriggered(Connection):
+            print('sleep(5)')
             sleep(5)
             # reset the status of the isMotionTriggered parameter to false
+            print('clear motion')
             UARTW.clearMotionTriggered(Connection)
+            print('sleep(2)')
+#            sleep(2)
             # check again in 3 seconds to confirm movement
             if UARTW.isMotionTriggered(Connection):
+                print('play audio')
                 # Play audio greeting
                 play_audio('greeting.mp3')
                 sleep(greeting_length)
@@ -103,11 +108,13 @@ while True:
                         # play audio well wishing
                         play_audio('happy_halloween.mp3')
                         sleep(farewell_length)
+                        update_database()
                         check_remaining_candy()
                         break
                     sleep(0.5)
-        # reset the status of the isMotionTriggered parameter to false
-        sleep(waitToLeave)
-        UARTW.clearMotionTriggered(Connection)
+            # reset the status of the isMotionTriggered parameter to false
+            print('wait to leave')
+            sleep(waitToLeave)
+            UARTW.clearMotionTriggered(Connection)
 
     input("Press enter to close")
