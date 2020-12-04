@@ -35,7 +35,7 @@ def read_stored_data():
 
 
 def play_audio(filename):
-    call("omxplayer " + str(filename), shell=True)
+    call("omxplayer -o local " + str(filename), shell=True)
 
 
 # Set up GPIO for refill button
@@ -103,14 +103,12 @@ while True:
     machine = machine_params[2]
     max_candy = int(machine_params[3])
 
-    print(candy_remaining)
-
     # initialize the serial connection to the arduino
     Connection = UARTW.initializeUART('/dev/ttyACM0')
     # Wait a little while for the connection to be set up
     sleep(2)
     # Wait one minute for the motion sensor to set up
-    sleep(60)
+#    sleep(60)
     # check if the motion sensor has been triggered
     while True:
         if UARTW.isMotionTriggered(Connection):
