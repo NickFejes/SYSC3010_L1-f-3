@@ -6,7 +6,6 @@ from time import sleep
 from subprocess import call
 import RPi.GPIO as GPIO
 import Bot
-
 import csv
 
 
@@ -17,7 +16,6 @@ Transaction_Number = 0
 candy_remaining = 0
 max_candy = 0
 machine = ''
-empty = False
 greeting_length = 0
 farewell_length = 0
 bagTimeout = 60
@@ -36,17 +34,8 @@ def read_stored_data():
         return data
 
 
-
 def play_audio(filename):
     call("omxplayer " + str(filename), shell=True)
-
-
-def refill_button_pushed():
-    play_audio('candy_refilled.mp3')
-    global candy_remaining
-    global empty
-    candy_remaining = max_candy
-    empty = False
 
 
 # Set up GPIO for refill button
@@ -55,7 +44,6 @@ GPIO.setwarnings(False)# Ignore warning for now
 GPIO.setmode(GPIO.BOARD)# Use physical pin numbering
 # Set pin 10 to be an input pin and set initial value to be pulled low (off)
 GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.add_event_detect(10,GPIO.RISING,callback=refill_button_pushed) # Setup event on pin 17 rising edge
 
 
 def check_remaining_candy():
@@ -63,14 +51,16 @@ def check_remaining_candy():
     global machine
     global Transaction_Number
     global max_candy
-    global empty
     Transaction_Number += 1
+    with open('var.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow([str(Transaction_Number), str(candy_remaining), machine, str(max_candy)])
     if candy_remaining == 0:
-        empty = True
         play_audio('out_of_candy.mp3')
         Bot.alert(machine)
-        while empty:
-            pass
+        GPIO.wait_for_edge(10, GPIO.RISING)
+        play_audio('candy_refilled.mp3')
+        candy_remaining = max_candy
     else:
         candy_remaining -= 1
     with open('var.csv', 'w') as csvfile:
