@@ -108,7 +108,7 @@ while True:
     # Wait a little while for the connection to be set up
     sleep(2)
     # Wait one minute for the motion sensor to set up
-#    sleep(60)
+    sleep(60)
     # check if the motion sensor has been triggered
     while True:
         if UARTW.isMotionTriggered(Connection):
