@@ -1,0 +1,4 @@
+CREATE DATABASE CandyDispenser;
+USE CandyDispenser;
+CREATE TABLE machines ( TsChannelId INT UNIQUE NOT NULL, ReadKey Text NOT NULL, MachineName TEXT NOT NULL,CurrentAmount int ,TotalDispensed int ,location TEXT NOT NULL ) ;
+CREATE TABLE timeLog (TsChannelId INT NOT NULL,record DATETIME);
